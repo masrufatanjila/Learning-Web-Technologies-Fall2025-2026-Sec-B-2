@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration Form</title>
+</head>
+<body>
+ <center>
+
+<h1>Registration</h1>
+
+<label>Select Field Type: </label>
+<select id="fieldType">
+    <option value="name">Name</option>
+    <option value="email">Email</option>
+    <option value="phone">Phone</option>
+    <option value="address">Address</option>
+    <option value="nid">National ID</option>
+    <option value="blood group">Blood group</option>
+    
+
+</select>
+
+<button onclick="addField()">+ Add</button>
+
+<br><br>
+
+<form id="regForm" onsubmit="return submitForm()">
+
+    <div id="fieldArea"></div>
+
+    <input type="submit" value="Submit">
+</form>
+
+<h3>Full Output</h3>
+<div id="finalData"></div>
+
+
+<script>
+
+let count = 0;
+
+// Add field
+function addField(){
+    count++;
+
+    let type = document.getElementById("fieldType").value;
+    let label = type.toUpperCase();
+
+    let div = `
+        <div>
+            <label>${label}: </label><br>
+            <input type="text" id="field${count}" data-type="${type}" data-label="${label}" 
+                   placeholder="Enter ${label}" onblur="validateField(${count})">
+            <p id="error${count}"></p>
+        </div><br>
+    `;
+
+    document.getElementById("fieldArea").innerHTML += div;
+}
+
+
+// Validation for each input
+function validateField(num){
+
+    let input = document.getElementById("field" + num);
+    let error = document.getElementById("error" + num);
+
+    let type = input.getAttribute("data-type");
+    let value = input.value.trim();
+    let msg = "";
+
+    if(type == "name"){
+        if(!/^[A-Za-z ]+$/.test(value)){
+            msg = "Name must contain only letters";
+        }
+    }
+
+    if(type == "email"){
+        if(!/^\S+@\S+\.\S+$/.test(value)){
+            msg = "Invalid email format";
+        }
+    }
+
+    if(type == "phone"){
+        if(!/^[0-9]+$/.test(value) || value.length < 10){
+            msg = "Phone must be 10 digits";
+        }
+    }
+
+    if(type == "address"){
+        if(value.length < 5){
+            msg = "Address too short";
+        }
+    }
+
+    if(type == "nid"){
+        if(!/^[0-9]+$/.test(value) || value.length < 8){
+            msg = "NID must be numbers and at least 8 digits";
+        }
+    }
+
+    if(msg != ""){
+        error.innerHTML = msg;
+        error.style.color = "red";
+        return false;
+    } else {
+        error.innerHTML = "";
+        return true;
+    }
+}
+
+
+// Submit form
+function submitForm(){
+
+    let final = document.getElementById("finalData");
+    final.innerHTML = "";
+
+    let inputs = document.querySelectorAll("#fieldArea input");
+    let allValid = true;
+
+    for(let i = 0; i < inputs.length; i++){
+        let id = inputs[i].id.replace("field", "");
+        if(!validateField(id)){
+            allValid = false;
+        }
+    }
+
+    if(!allValid){
+        alert("❌ Fix errors first!");
+        return false;
+    }
+
+    let output = "✔ Registration Successful!\n\n";
+
+    inputs.forEach(input => {
+        let label = input.getAttribute("data-label");
+        let value = input.value;
+
+        final.innerHTML += "<p><b>" + label + ":</b> " + value + "</p>";
+        output += label + ": " + value + "\n";
+    });
+
+    alert(output);
+    return false;  
+}
+
+</script>
+</center>
+</body>
+</html>
+
